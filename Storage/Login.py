@@ -20,7 +20,7 @@ def function_Login():
     ID = request.args.get("ID")
     PW = request.args.get("PW")
 
-    SQL = f"SELECT * FROM LoginData;"
+    SQL = f"SELECT * FROM LoginData WHERE ID = \"{ID}\";"
     SELECT_LOGINDATA = db_Class.excuteAll(SQL)
 
     if SELECT_LOGINDATA: #데이터 있음
@@ -95,19 +95,12 @@ def function_IDSearch():
     SELECT_LOGINDATA_WHERE_EMAIL = db_Class.excuteAll(SQL)
 
     if SELECT_LOGINDATA_WHERE_EMAIL:
-        if SELECT_LOGINDATA_WHERE_EMAIL[0]["EMail"] == EMail:
-            main_Class.sendMail(EMail, "FIFA4 미니저장소 아이디 찾기", f"아이디: {SELECT_LOGINDATA_WHERE_EMAIL[0]['ID']}")
-            
-            Success_Send = {
-                "Result": "Send Ok"
-            }
-            return json.dumps(Success_Send)
-
-        else:
-            Error_Send = {
-                "Result": "EMail Error"
-            }
-            return json.dumps(Error_Send)
+        main_Class.sendMail(EMail, "FIFA4 미니저장소 아이디 찾기", f"아이디: {SELECT_LOGINDATA_WHERE_EMAIL[0]['ID']}")
+        
+        Success_Send = {
+            "Result": "Send Ok"
+        }
+        return json.dumps(Success_Send)
     else:
         Error_Send = {
             "Result": "EMail Error"
@@ -146,3 +139,23 @@ def function_PWChange():
             "Result": "ID Error"
         }
         return json.dumps(Error_Change)
+
+@Login_Blueprint.route("/getid")
+def function_GetID():
+    Token = request.args.get("Token")
+
+    SQL = f"SELECT * FROM LoginData WHERE TOKEN = \"{Token}\";"
+    SELECT_LOGINDATA_WHERE_TOKEN = db_Class.excuteAll(SQL)
+
+    if SELECT_LOGINDATA_WHERE_TOKEN:
+        Success_GetID = {
+            "Result": "GetID Ok",
+            "ID": SELECT_LOGINDATA_WHERE_TOKEN[0]["ID"]
+        }
+        return json.dumps(Success_GetID)
+
+    else:
+        Error_GetID = {
+            "Result": "Error GetID"
+        }
+        return json.dumps(Error_GetID)
